@@ -17,10 +17,61 @@ class UsersVC: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        print("Hi")
+        getUsers()
+    }
+    
+    // Networking Request
+    func getUsers(){
+        
+        
+        guard let url = URL(string: "https://jsonplaceholder.typicode.com/users") else
+        {return}
+        
+        let session = URLSession.shared
+        
+        let dataTask = session.dataTask(with: url) { (data, response, error)
+            in
+            
+            if let httpResponse = response as? HTTPURLResponse {
+                print(httpResponse.statusCode)
+                //quick 3digit nubmer good is 200 fail is 404
+                
+            }
+            if let error = error{
+                print(error)
+            }else if let data = data{
+                print(data)
+                
+               // let dataString = String(data: data, encoding: .utf8)
+                
+                do {
+                    let json = try JSONSerialization.jsonObject(with: data, options: [])
+                    print(json)
+                    
+                    
+                    
+                } catch let err {
+                    print(err)
+                    
+                }
+                
+                
+                
+            }
+            
+            
+        }
+        
+        dataTask.resume()
+        
+        
+    }
+    
+    
+    
 
     
-    }
+    
     // gets the number of rows you need to be printed
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return temporaryUsers.count
