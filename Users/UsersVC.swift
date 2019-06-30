@@ -13,6 +13,10 @@ class UsersVC: UITableViewController {
     
     let temporaryUsers = ["Alan", "Jessica", "Kyle L.", "Kyle M.", "Steven" ]
     
+    var users = [User]()
+    
+    
+    
     
 
     override func viewDidLoad() {
@@ -45,8 +49,33 @@ class UsersVC: UITableViewController {
                // let dataString = String(data: data, encoding: .utf8)
                 
                 do {
-                    let json = try JSONSerialization.jsonObject(with: data, options: [])
-                    print(json)
+                    guard let json = try JSONSerialization.jsonObject(with: data, options: []) as?
+                        [[String: Any]] else {return}
+                    
+                    // making an array to hold users
+                    var users = [User]()
+                    
+                    //parsing turns into in an object , access diff values
+                    for userDictionary in json{
+                        
+                       guard
+                            let name = userDictionary["name"] as? String,
+                            let address = userDictionary["address"] as? [String: Any],
+                            let city = address["city"] as? String
+                            else {return}
+                      
+                        
+                        let user = User(name: name, city: city)
+                        users.append(user)
+                        
+                    }
+                    print(users)
+                    self.users = users
+                    DispatchQueue.main.async {
+                         self.tableView.reloadData()
+                    }
+                    
+                   
                     
                     
                     
@@ -70,19 +99,20 @@ class UsersVC: UITableViewController {
     
     
 
-    
+    //changed from the hard coded ussers we had to objects of users below
     
     // gets the number of rows you need to be printed
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return temporaryUsers.count
+        return users.count
     }
     
     // lookin to return a cell
     // index path gets back the row / info you have
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = UITableViewCell()
-        let user = temporaryUsers[indexPath.row]
-        cell.textLabel?.text = user
+        let cell = UITableViewCell(style: .subtitle, reuseIdentifier: nil)
+        let user = users[indexPath.row]
+        cell.textLabel?.text = user.name
+        cell.detailTextLabel?.text = user.city
         
         return cell
         
